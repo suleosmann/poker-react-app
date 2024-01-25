@@ -3,38 +3,42 @@ import React, { useState } from 'react';
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [message, setMessage] = useState('');
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    // Perform validation or additional checks if needed
+    const userData = {
+      username: username,
+      password: password,
+    };
 
-    // Example: Check if password and confirm password match
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-
-    // Send signup data to the server
     try {
       const response = await fetch('http://localhost:5555/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
+        body: JSON.stringify(userData),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        alert(data.message); // Show success message
+        setMessage(data.message);
+
+        // Redirect to the gamepage
+        window.location.href = '/gamepage';
       } else {
-        alert(data.message); // Show error message
+        setMessage(data.message);
       }
     } catch (error) {
       console.error('Error during signup:', error);
@@ -47,21 +51,17 @@ const Signup = () => {
       <form onSubmit={handleSignup}>
         <label>
           Username:
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+          <input type="text" value={username} onChange={handleUsernameChange} />
         </label>
         <br />
         <label>
           Password:
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <input type="password" value={password} onChange={handlePasswordChange} />
         </label>
         <br />
-        <label>
-          Confirm Password:
-          <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-        </label>
-        <br />
-        <button type="submit">Signup</button>
+        <button type="submit">Sign Up</button>
       </form>
+      {message && <p>{message}</p>}
     </div>
   );
 };
